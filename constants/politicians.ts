@@ -223,7 +223,7 @@ export const vicePresidents: Politician[] = [
       {bill: 'Socialized Housing Fund Bill', vote: 'YES'},
     ],
     bio: 'Former Senate Majority Leader and 3-term Senator from Pampanga. Running mate of Montemayor. Regarded as a steady legislative hand with a focus on overseas Filipino workers and housing.',
-    profileSrc: null,
+    profileSrc: require('../assets/images/vice_president/Corazon.png'),
   },
   {
     id: 'vp-002',
@@ -251,7 +251,7 @@ export const vicePresidents: Politician[] = [
       {bill: 'Anti-Red Tape Act Amendment', vote: 'YES'},
     ],
     bio: 'Former COA Commissioner and anti-corruption advocate from Laguna. Running mate of Villanueva-Santos. Lowest net worth among VP candidates — often cited as a point of credibility on his fiscal transparency platform.',
-    profileSrc: null,
+    profileSrc: require('../assets/images/vice_president/Gregorio.png'),
   },
   {
     id: 'vp-003',
@@ -283,7 +283,7 @@ export const vicePresidents: Politician[] = [
       {bill: 'National Land Use Act', vote: 'YES'},
     ],
     bio: 'Two-term former Governor of Leyte and disaster risk reduction advocate. Running mate of Cabanero. Strong grassroots support in Eastern Visayas. One pending COA flag on calamity fund usage.',
-    profileSrc: null,
+    profileSrc: require('../assets/images/vice_president/Maricel.png'),
   },
   {
     id: 'vp-004',
@@ -311,7 +311,7 @@ export const vicePresidents: Politician[] = [
       {bill: 'Digital Jobs Act', vote: 'YES'},
     ],
     bio: 'Former DICT Secretary and startup ecosystem builder from Batangas. Running mate of Bautista-Reyes. Youngest VP candidate. Limited electoral experience but regarded as a competent technocrat.',
-    profileSrc: null,
+    profileSrc: require('../assets/images/vice_president/Fernan.png'),
   },
 ];
 
@@ -349,7 +349,7 @@ export const senators: Politician[] = [
       {bill: 'Agrarian Reform Extension Act', vote: 'YES'},
     ],
     bio: 'Veteran senator from Ilocos Sur with 18 years of service. Strong agrarian reform advocate. Two pending accountability cases raise questions about fund management.',
-    profileSrc: null,
+    profileSrc: require('../assets/images/senators/Andres.png'),
   },
   {
     id: 's-002',
@@ -377,7 +377,7 @@ export const senators: Politician[] = [
       {bill: 'Mental Health Act Amendment', vote: 'YES'},
     ],
     bio: 'Two-term senator from Quezon City. Consistent champion of SOGIE rights and mental health legislation. Near-perfect attendance record and a clean accountability history.',
-    profileSrc: null,
+    profileSrc: require('../assets/images/senators/Soledad.png'),
   },
   {
     id: 's-003',
@@ -409,7 +409,7 @@ export const senators: Politician[] = [
       {bill: 'Federalism Charter Change Bill', vote: 'YES'},
     ],
     bio: 'Most senior senator from Cebu with 24 years in office and the highest legislative output in this cycle. Acquitted of a 2018 plunder case. Attendance rate has declined in recent years.',
-    profileSrc: null,
+    profileSrc: require('../assets/images/senators/Bonifacio.png'),
   },
   {
     id: 's-004',
@@ -436,7 +436,7 @@ export const senators: Politician[] = [
       {bill: 'SIM Registration Act', vote: 'NO'},
     ],
     bio: 'First-term senator from Taguig and former tech policy consultant. Strong advocate for digital rights and data privacy. Clean record and above-average attendance for a freshman senator.',
-    profileSrc: null,
+    profileSrc: require('../assets/images/senators/Clarissa.png'),
   },
   {
     id: 's-005',
@@ -468,7 +468,7 @@ export const senators: Politician[] = [
       {bill: 'Mining Reform Bill', vote: 'NO'},
     ],
     bio: 'Two-term senator from Pampanga focused on infrastructure and PPP initiatives. Flagged in a PCIJ report regarding quarry permits. Still under review with no formal charges filed.',
-    profileSrc: null,
+    profileSrc: require('../assets/images/senators/Herminio.png'),
   },
   {
     id: 's-006',
@@ -496,7 +496,7 @@ export const senators: Politician[] = [
       {bill: 'PhilHealth Reform Bill', vote: 'YES'},
     ],
     bio: 'Independent two-term senator from Iloilo and former physician. One of the most credible voices on healthcare legislation. No party affiliation; widely respected across the aisle.',
-    profileSrc: null,
+    profileSrc: require('../assets/images/senators/Theresa.png'),
   },
   {
     id: 's-007',
@@ -531,7 +531,7 @@ export const senators: Politician[] = [
       {bill: 'Human Rights Commission Budget', vote: 'NO'},
     ],
     bio: 'Veteran senator from Davao del Norte with a strong law-and-order platform. Two pending accountability cases, including a lifestyle check flagged by the Ombudsman.',
-    profileSrc: null,
+    profileSrc: require('../assets/images/senators/Rodrigo.png'),
   },
   {
     id: 's-008',
@@ -559,7 +559,7 @@ export const senators: Politician[] = [
       {bill: 'Labor Code Amendment', vote: 'YES'},
     ],
     bio: 'Second-term senator from Batangas and former labor lawyer. Highest attendance rate in the Senate this cycle (99%). Authored landmark amendments to the Anti-VAWC Act.',
-    profileSrc: null,
+    profileSrc: require('../assets/images/senators/Patricia.png'),
   },
   {
     id: 's-009',
@@ -595,7 +595,7 @@ export const senators: Politician[] = [
       {bill: 'Anti-Political Dynasty Bill', vote: 'NO'},
     ],
     bio: 'Longest-serving active senator from Negros Occidental. Highest net worth and most accountability flags in this cycle. Strong agricultural bloc backing despite ongoing legal challenges.',
-    profileSrc: null,
+    profileSrc: require('../assets/images/senators/Victorino.png'),
   },
   {
     id: 's-010',
@@ -622,7 +622,7 @@ export const senators: Politician[] = [
       {bill: 'Digital Peso Bill', vote: 'YES'},
     ],
     bio: 'First-term senator from Makati and former fintech executive. Youngest sitting senator. Focused on leveraging technology for poverty reduction and financial inclusion.',
-    profileSrc: null,
+    profileSrc: require('../assets/images/senators/Marisol.png'),
   },
   {
     id: 's-011',
@@ -654,7 +654,7 @@ export const senators: Politician[] = [
       {bill: 'Anti-Terror Act', vote: 'YES'},
     ],
     bio: 'Two-term senator from Maguindanao and key peace process negotiator. A 2020 extrajudicial killing allegation was dismissed in 2022. Remains the leading voice for Mindanao autonomy in the Senate.',
-    profileSrc: null,
+    profileSrc: require('../assets/images/senators/Emmanuel.png'),
   },
   {
     id: 's-012',
@@ -682,7 +682,7 @@ export const senators: Politician[] = [
       {bill: 'National Disaster Risk Reduction Fund', vote: 'YES'},
     ],
     bio: 'Independent second-term senator from typhoon-prone Leyte. Personal experience with Yolanda drives her disaster resilience platform. One of the most consistently rated senators by civil society groups.',
-    profileSrc: null,
+    profileSrc: require('../assets/images/senators/Jovita.png'),
   },
   {
     id: 's-013',
@@ -1058,7 +1058,7 @@ export const partyList: Politician[] = [
     accountabilityFlags: {status: 'clear', count: 0, details: []},
     platform: ['Free Education', 'Youth Employment', 'Student Debt Relief'],
     bio: 'Youngest party-list representative. Former student council national president. Advocates for universal free education and youth entrepreneurship programs.',
-    profileSrc: null,
+    profileSrc: require('../assets/images/partylist/ALAB-Kabataan.png'),
   },
   {
     id: 'pl-002',
@@ -1086,7 +1086,7 @@ export const partyList: Politician[] = [
     },
     platform: ['Land Reform', 'Irrigation', 'Farm-to-Market Roads'],
     bio: 'Second-term party-list representative for farmers from Central Luzon. Faces a COMELEC sector representation review — opponents question whether the org genuinely represents small farmers.',
-    profileSrc: null,
+    profileSrc: require('../assets/images/partylist/BUHAY Magsasaka.png'),
   },
   {
     id: 'pl-003',
@@ -1111,7 +1111,7 @@ export const partyList: Politician[] = [
     accountabilityFlags: {status: 'clear', count: 0, details: []},
     platform: ['Wage Increase', 'Labor Rights', 'End of Contractualization'],
     bio: 'Second-term party-list representative for workers. Former union organizer with 20 years in labor advocacy. Highest attendance rate among party-list reps. Key author of the No-Endo Law amendment.',
-    profileSrc: null,
+    profileSrc: require('../assets/images/partylist/SIKAP Manggagawa.png'),
   },
   {
     id: 'pl-004',
