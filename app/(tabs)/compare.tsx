@@ -1,5 +1,7 @@
-import React, {useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {
+  Animated,
+  Easing,
   ScrollView,
   View,
   Text,
@@ -7,17 +9,21 @@ import {
   Image,
   Modal,
   FlatList,
-  TextInput
+  TextInput,
+  StatusBar,
+  NativeScrollEvent,
+  NativeSyntheticEvent
 } from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
 import {Zap, AlertTriangle, CheckCircle, X, Search} from 'lucide-react-native';
 import {useRouter} from 'expo-router';
+import {useFocusEffect} from '@react-navigation/native';
 import {Ionicons} from '@expo/vector-icons';
 import {
   allPoliticians,
   type Politician,
   type Position
 } from '@/constants/dataset';
+import {useTabChrome} from '@/hooks/TabChromeContext';
 
 // ─── Position filter config ───────────────────────────────────────────────────
 const POSITION_FILTERS: {label: string; value: Position | 'All'}[] = [
@@ -45,6 +51,14 @@ const POSITION_COLORS: Record<
     dot: 'bg-emerald-500'
   }
 };
+
+const CARD_SURFACE = {
+  shadowColor: '#0f172a',
+  shadowOpacity: 0.06,
+  shadowRadius: 12,
+  shadowOffset: {width: 0, height: 3},
+  elevation: 2
+} as const;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // PICKER MODAL
@@ -80,7 +94,7 @@ function PickerModal({
       animationType="slide"
       presentationStyle="pageSheet"
     >
-      <SafeAreaView className="flex-1 bg-white">
+      <View className="flex-1 bg-white">
         {/* Header */}
         <View className="flex-row items-center justify-between px-5 py-4 border-b border-slate-100">
           <Text className="text-[17px] font-bold text-slate-800">
@@ -96,7 +110,7 @@ function PickerModal({
 
         {/* Search */}
         <View className="px-4 py-3">
-          <View className="flex-row items-center bg-slate-100 rounded-xl px-3 h-11">
+          <View className="flex-row items-center bg-slate-100 rounded-2xl px-3.5 h-12">
             <Search size={16} color="#94a3b8" />
             <View className="flex-1 ml-2">
               <Text className="text-[14px] text-slate-700" onPress={() => {}} />
@@ -146,7 +160,7 @@ function PickerModal({
                 <Pressable
                   key={f.value}
                   onPress={() => setFilter(f.value as Position | 'All')}
-                  className={`px-3 py-1.5 rounded-full border ${
+                  className={`px-3.5 py-2 rounded-full border ${
                     active
                       ? 'bg-[#1e293b] border-[#1e293b]'
                       : 'bg-white border-slate-200'
@@ -180,7 +194,7 @@ function PickerModal({
                   onSelect(item);
                   onClose();
                 }}
-                className="flex-row items-center px-5 py-3 active:bg-slate-50"
+                className="flex-row items-center px-5 py-3.5 active:bg-slate-50"
               >
                 <View className="w-12 h-12 rounded-full bg-slate-200 overflow-hidden items-center justify-center mr-3">
                   {item.profileSrc ? (
@@ -220,7 +234,7 @@ function PickerModal({
             );
           }}
         />
-      </SafeAreaView>
+      </View>
     </Modal>
   );
 }
@@ -248,7 +262,7 @@ function CandidateSlot({
         >
           <Ionicons name="add" size={24} color="#94a3b8" />
         </View>
-        <Text className="text-slate-400 text-[11px] mt-2">Tap to select</Text>
+        <Text className="text-slate-400 text-[11px] mt-2 font-medium">Tap to select</Text>
       </Pressable>
     );
   }
@@ -308,7 +322,7 @@ function CandidateSlot({
 // ─────────────────────────────────────────────────────────────────────────────
 function SectionLabel({label}: {label: string}) {
   return (
-    <Text className="text-center text-[11px] font-semibold tracking-widest uppercase mb-3 text-slate-400">
+    <Text className="text-center text-[11px] font-bold tracking-widest uppercase mb-3 text-slate-500">
       {label}
     </Text>
   );
@@ -333,14 +347,8 @@ function StatRow({
 }) {
   return (
     <View
-      className="mx-4 mb-3 px-5 py-4 rounded-2xl bg-white"
-      style={{
-        shadowColor: '#000',
-        shadowOpacity: 0.06,
-        shadowRadius: 8,
-        shadowOffset: {width: 0, height: 2},
-        elevation: 2
-      }}
+      className="mx-4 mb-3 px-5 py-4 rounded-3xl bg-white border border-slate-100"
+      style={CARD_SURFACE}
     >
       <SectionLabel label={label} />
       <View className="flex-row justify-between items-end">
@@ -397,14 +405,8 @@ function AttendanceRow({a, b}: {a: Politician; b: Politician}) {
   const aWins = a.attendanceRate >= b.attendanceRate;
   return (
     <View
-      className="mx-4 mb-3 px-5 py-4 rounded-2xl bg-white"
-      style={{
-        shadowColor: '#000',
-        shadowOpacity: 0.06,
-        shadowRadius: 8,
-        shadowOffset: {width: 0, height: 2},
-        elevation: 2
-      }}
+      className="mx-4 mb-3 px-5 py-4 rounded-3xl bg-white border border-slate-100"
+      style={CARD_SURFACE}
     >
       <SectionLabel label="Attendance Rate" />
       <View className="flex-row justify-between items-end mb-3">
@@ -521,14 +523,8 @@ function AccountabilityRow({a, b}: {a: Politician; b: Politician}) {
 
   return (
     <View
-      className="mx-4 mb-3 px-5 py-4 rounded-2xl bg-white"
-      style={{
-        shadowColor: '#000',
-        shadowOpacity: 0.06,
-        shadowRadius: 8,
-        shadowOffset: {width: 0, height: 2},
-        elevation: 2
-      }}
+      className="mx-4 mb-3 px-5 py-4 rounded-3xl bg-white border border-slate-100"
+      style={CARD_SURFACE}
     >
       <SectionLabel label="Accountability Flags" />
       <View className="flex-row items-start gap-3">
@@ -554,14 +550,8 @@ function AccountabilityRow({a, b}: {a: Politician; b: Politician}) {
 function PlatformRow({a, b}: {a: Politician; b: Politician}) {
   return (
     <View
-      className="mx-4 mb-3 px-5 py-4 rounded-2xl bg-white"
-      style={{
-        shadowColor: '#000',
-        shadowOpacity: 0.06,
-        shadowRadius: 8,
-        shadowOffset: {width: 0, height: 2},
-        elevation: 2
-      }}
+      className="mx-4 mb-3 px-5 py-4 rounded-3xl bg-white border border-slate-100"
+      style={CARD_SURFACE}
     >
       <SectionLabel label="Platform" />
       <View className="flex-row justify-between gap-3">
@@ -625,7 +615,7 @@ function QuickInsight({a, b}: {a: Politician; b: Politician}) {
 
   return (
     <View
-      className="mx-4 mb-4 rounded-2xl px-5 py-4"
+      className="mx-4 mb-4 rounded-3xl px-5 py-4"
       style={{backgroundColor: '#1A1F36'}}
     >
       <View className="flex-row items-center gap-2 mb-2">
@@ -699,7 +689,7 @@ function EmptyCompare({
       <View className="flex-row gap-3 w-full">
         <Pressable
           onPress={onSelectA}
-          className="flex-1 py-3 rounded-2xl border-2 border-dashed border-amber-300 items-center"
+          className="flex-1 py-3.5 rounded-2xl border-2 border-dashed border-amber-300 items-center"
           style={{backgroundColor: '#fffbeb'}}
         >
           <Text className="text-amber-600 font-bold text-[13px]">
@@ -708,7 +698,7 @@ function EmptyCompare({
         </Pressable>
         <Pressable
           onPress={onSelectB}
-          className="flex-1 py-3 rounded-2xl border-2 border-dashed border-indigo-300 items-center"
+          className="flex-1 py-3.5 rounded-2xl border-2 border-dashed border-indigo-300 items-center"
           style={{backgroundColor: '#eef2ff'}}
         >
           <Text className="text-indigo-600 font-bold text-[13px]">
@@ -724,31 +714,101 @@ function EmptyCompare({
 // MAIN SCREEN
 // ─────────────────────────────────────────────────────────────────────────────
 export default function CompareScreen() {
+  const {chromeVisible, setChromeVisible} = useTabChrome();
   const [candidateA, setCandidateA] = useState<Politician | null>(null);
   const [candidateB, setCandidateB] = useState<Politician | null>(null);
   const [showPickerA, setShowPickerA] = useState(false);
   const [showPickerB, setShowPickerB] = useState(false);
+  const [headerHeight, setHeaderHeight] = useState(0);
+  const lastOffsetY = useRef(0);
+  const headerAnim = useRef(new Animated.Value(1)).current;
 
   const bothSelected = candidateA && candidateB;
 
+  useFocusEffect(
+    useCallback(() => {
+      setChromeVisible(true);
+    }, [setChromeVisible])
+  );
+
+  useEffect(() => {
+    Animated.timing(headerAnim, {
+      toValue: chromeVisible ? 1 : 0,
+      duration: 220,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: true
+    }).start();
+  }, [chromeVisible, headerAnim]);
+
+  const onMainScroll = useCallback(
+    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+      const currentY = event.nativeEvent.contentOffset.y;
+      const delta = currentY - lastOffsetY.current;
+
+      if (currentY <= 0) {
+        setChromeVisible(true);
+      } else if (delta > 6 && currentY > 40) {
+        setChromeVisible(false);
+      } else if (delta < -6) {
+        setChromeVisible(true);
+      }
+
+      lastOffsetY.current = currentY;
+    },
+    [setChromeVisible]
+  );
+
+  const headerTranslateY = headerAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [-(headerHeight || 160), 0]
+  });
+  const headerOpacity = headerAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, 1]
+  });
+
   return (
-    <SafeAreaView className="flex-1" style={{backgroundColor: '#F3F4F8'}}>
-      {/* ── Top header ── */}
-      <View className="bg-white px-5 py-4 border-b border-slate-100">
-        <Text className="text-[18px] font-bold text-slate-800">Compare</Text>
-        <Text className="text-[12px] text-slate-400 mt-0.5">
+    <View className="flex-1 bg-slate-50">
+      <StatusBar barStyle="dark-content" backgroundColor="#f8fafc" />
+
+      <Animated.View
+        onLayout={e => setHeaderHeight(e.nativeEvent.layout.height)}
+        className="bg-white pt-14 pb-5 px-5 border-b border-slate-100 absolute top-0 left-0 right-0 z-20"
+        style={{transform: [{translateY: headerTranslateY}], opacity: headerOpacity}}
+      >
+        <View className="flex-row items-center gap-2 mb-4">
+          <View className="w-7 h-7 rounded items-center justify-center">
+            <Image
+              source={require('../../assets/images/Matyag-no-bg-no-text.png')}
+              style={{width: 54, height: 54, resizeMode: 'contain'}}
+            />
+          </View>
+          <Text className="text-[31px] pl-2 font-black text-slate-800 tracking-tight">
+            Matyag
+          </Text>
+        </View>
+        <Text className="text-[14px] text-slate-600">
           Select two politicians to compare side by side
         </Text>
-      </View>
+      </Animated.View>
 
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{paddingBottom: 100}}
+        onScroll={onMainScroll}
+        scrollEventThrottle={16}
+        contentContainerStyle={{paddingTop: headerHeight + 12, paddingBottom: 110}}
       >
         {/* ── Candidate header ── */}
         <View
-          className="mx-4 mt-4 rounded-3xl overflow-hidden"
-          style={{backgroundColor: '#1A1F36'}}
+          className="mx-4 mt-4 rounded-3xl overflow-hidden border border-[#27314d]"
+          style={{
+            backgroundColor: '#1A1F36',
+            shadowColor: '#0f172a',
+            shadowOpacity: 0.2,
+            shadowRadius: 14,
+            shadowOffset: {width: 0, height: 6},
+            elevation: 4
+          }}
         >
           <View className="px-6 pt-6 pb-8">
             <View className="flex-row items-center justify-between">
@@ -848,6 +908,6 @@ export default function CompareScreen() {
         onSelect={setCandidateB}
         exclude={candidateA?.id}
       />
-    </SafeAreaView>
+    </View>
   );
 }

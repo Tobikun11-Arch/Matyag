@@ -52,6 +52,14 @@ const BRANCH_LABEL: Record<Position, string> = {
   'Party-list': 'Legislative · National'
 };
 
+const CARD_SURFACE = {
+  shadowColor: '#0f172a',
+  shadowOpacity: 0.06,
+  shadowRadius: 14,
+  shadowOffset: {width: 0, height: 4},
+  elevation: 3
+} as const;
+
 // ─── Flag indicator ───────────────────────────────────────────────────────────
 function FlagDot({status}: {status: string}) {
   if (status === 'clear') return null;
@@ -78,19 +86,19 @@ function PoliticianCard({
   return (
     <Pressable
       onPress={onPress}
-      className="flex-row items-center px-5 py-4 bg-white active:bg-slate-50"
+      className="flex-row items-center px-5 py-3.5 bg-white active:bg-slate-50"
     >
       {/* Avatar */}
       <View className="relative mr-4">
-        <View className="w-14 h-14 rounded-full bg-slate-200 items-center justify-center overflow-hidden">
+        <View className="w-[52px] h-[52px] rounded-full bg-slate-200 items-center justify-center overflow-hidden">
           {item.profileSrc ? (
             <Image
               source={item.profileSrc}
               style={{
-                width: 56,
-                height: 80,
+                width: 52,
+                height: 74,
                 resizeMode: 'cover',
-                marginBottom: -25 
+                marginBottom: -22
               }}
             />
           ) : (
@@ -103,7 +111,7 @@ function PoliticianCard({
       {/* Info */}
       <View className="flex-1">
         <Text
-          className="text-[15px] font-semibold text-slate-800"
+          className="text-[15px] font-bold text-slate-800"
           numberOfLines={1}
         >
           {item.honorific} {item.fullName}
@@ -118,10 +126,10 @@ function PoliticianCard({
               {item.position}
             </Text>
           </View>
-          <Text className="text-[11px] text-slate-400">{branch}</Text>
+          <Text className="text-[11px] text-slate-500">{branch}</Text>
         </View>
         {item.organization && (
-          <Text className="text-[11px] text-slate-400 mt-0.5" numberOfLines={1}>
+          <Text className="text-[11px] text-slate-500 mt-0.5" numberOfLines={1}>
             {item.organization}
           </Text>
         )}
@@ -141,11 +149,11 @@ function Divider() {
 // ─── Section header ───────────────────────────────────────────────────────────
 function SectionHeader({title, count}: {title: string; count: number}) {
   return (
-    <View className="px-5 pt-5 pb-2 flex-row items-center justify-between">
-      <Text className="text-[13px] font-semibold text-slate-400 uppercase tracking-widest">
+    <View className="px-5 pt-6 pb-2.5 flex-row items-center justify-between">
+      <Text className="text-[12px] font-bold text-slate-400 uppercase tracking-widest">
         {title}
       </Text>
-      <Text className="text-[12px] text-slate-400">{count} total</Text>
+      <Text className="text-[12px] text-slate-500">{count} total</Text>
     </View>
   );
 }
@@ -191,27 +199,27 @@ export default function HomeScreen() {
       <StatusBar barStyle="dark-content" backgroundColor="#f8fafc" />
 
       {/* ── Header ── */}
-      <View className="bg-white pt-14 pb-4 px-5 border-b border-slate-100">
+      <View className="bg-white pt-14 pb-5 px-5 border-b border-slate-100">
         <View className="flex-row items-center justify-between mb-4">
           <View className="flex-row items-center gap-2">
-            <View className="w-7 h-7 bg-[#1e293b] rounded items-center justify-center">
-              <Ionicons name="business" size={14} color="white" />
+            <View className="w-7 h-7 rounded items-center justify-center">
+              <Image
+                source={require('../../assets/images/Matyag-no-bg-no-text.png')}
+                style={{width: 54, height: 54, resizeMode: 'contain'}}
+              />
             </View>
-            <Text className="text-xl font-bold text-slate-800 tracking-tight">
+            <Text className="text-[31px] pl-2 font-black text-slate-800 tracking-tight">
               Matyag
             </Text>
           </View>
-          <Pressable className="relative">
-            <Ionicons name="notifications-outline" size={22} color="#64748b" />
-          </Pressable>
         </View>
 
         {/* Search bar */}
-        <View className="flex-row items-center gap-2">
-          <View className="flex-1 flex-row items-center bg-slate-100 rounded-xl px-3 h-11">
+        <View className="flex-row items-center gap-2.5">
+          <View className="flex-1 flex-row items-center bg-slate-100 rounded-2xl px-3.5 h-12">
             <Ionicons name="search-outline" size={17} color="#94a3b8" />
             <TextInput
-              className="flex-1 ml-2 text-[14px] text-slate-700"
+              className="flex-1 ml-2.5 text-[14px] text-slate-700"
               placeholder="Search by name, position..."
               placeholderTextColor="#94a3b8"
               value={query}
@@ -228,7 +236,7 @@ export default function HomeScreen() {
           {/* Filter toggle */}
           <Pressable
             onPress={() => setShowFilterMenu(v => !v)}
-            className={`w-11 h-11 rounded-xl items-center justify-center ${showFilterMenu ? 'bg-[#1e293b]' : 'bg-slate-100'}`}
+            className={`w-12 h-12 rounded-2xl items-center justify-center ${showFilterMenu ? 'bg-[#1e293b]' : 'bg-slate-100'}`}
           >
             <Ionicons
               name="options-outline"
@@ -252,7 +260,7 @@ export default function HomeScreen() {
                 <Pressable
                   key={f.value}
                   onPress={() => setFilter(f.value as Position | 'All')}
-                  className={`px-4 py-1.5 rounded-full border ${
+                  className={`px-4 py-2 rounded-full border ${
                     active
                       ? 'bg-[#1e293b] border-[#1e293b]'
                       : 'bg-white border-slate-200'
@@ -301,7 +309,7 @@ export default function HomeScreen() {
               {index < results.length - 1 && <Divider />}
             </>
           )}
-          contentContainerStyle={{paddingBottom: 100}}
+          contentContainerStyle={{paddingBottom: 110}}
         />
       ) : (
         // ── Default browsing view ──
@@ -312,7 +320,10 @@ export default function HomeScreen() {
             <>
               {/* Featured */}
               <SectionHeader title="Featured" count={featured.length} />
-              <View className="bg-white rounded-2xl mx-4 overflow-hidden shadow-sm">
+              <View
+                className="bg-white rounded-3xl mx-4 overflow-hidden border border-slate-100"
+                style={CARD_SURFACE}
+              >
                 {featured.map((item, index) => (
                   <React.Fragment key={item.id}>
                     <PoliticianCard

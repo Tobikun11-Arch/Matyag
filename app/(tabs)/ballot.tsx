@@ -18,11 +18,12 @@ import {
   Modal,
   Pressable,
   ScrollView,
+  StatusBar,
   StyleSheet,
   Text,
   View
 } from 'react-native';
-import {SafeAreaView, useSafeAreaInsets} from 'react-native-safe-area-context';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import ViewShot, {captureRef} from 'react-native-view-shot';
 
 const {width: W, height: H} = Dimensions.get('window');
@@ -52,6 +53,14 @@ const POSITION_ORDER: Position[] = [
   'Senator',
   'Party-list'
 ];
+const BALLOT_CARD_HEIGHT = 280;
+const CARD_SURFACE = {
+  shadowColor: '#0f172a',
+  shadowOpacity: 0.06,
+  shadowRadius: 12,
+  shadowOffset: {width: 0, height: 3},
+  elevation: 2
+} as const;
 
 // ─── Theme colors ─────────────────────────────────────────────────────────────
 const SLIDE_BG = {
@@ -141,26 +150,52 @@ function SlidePresident({
 
   return (
     <View style={[ss.slide, {backgroundColor: SLIDE_BG.president}]}>
-      <Blob color={C.phYellow} size={260} top={-80} left={-80} opacity={0.12} />
+      <Blob color="#000" size={260} top={-80} left={-80} opacity={0.12} />
       <Blob
-        color={C.phBlue}
+        color="#000"
         size={200}
         top={H * 0.55}
         left={W * 0.6}
         opacity={0.15}
       />
-      <Blob color={C.phRed} size={150} top={H * 0.7} left={-40} opacity={0.1} />
+      <Blob color="#000" size={150} top={H * 0.7} left={-40} opacity={0.1} />
 
       <View style={ss.slideMiddle}>
         {candidate ? (
           <>
+            <Image
+              source={require('../../assets/images/Matyag-overlay.png')}
+              style={{
+                position: 'absolute',
+                top: 94,
+                alignSelf: 'center',
+                width: 200,
+                height: 200,
+                resizeMode: 'contain',
+                zIndex: 3
+              }}
+            />
             <Text style={ss.statementTop}>My chosen</Text>
-            <Text style={[ss.statementBig, {color: C.gold}]}>President</Text>
+            <Text
+              style={[
+                ss.statementBig,
+                {color: C.gold, fontSize: 40, lineHeight: 42}
+              ]}
+            >
+              President
+            </Text>
             <View style={[ss.photoBig, {borderColor: C.gold}]}>
               {candidate.profileSrc ? (
                 <Image
                   source={candidate.profileSrc as ImageSourcePropType}
-                  style={{width: '100%', height: '150%', resizeMode: 'cover'}}
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '170%',
+                    resizeMode: 'cover'
+                  }}
                 />
               ) : (
                 <View
@@ -232,40 +267,58 @@ function SlideVP({
 
   return (
     <View style={[ss.slide, {backgroundColor: SLIDE_BG.vp}]}>
+      <Blob color="#000" size={280} top={-60} left={W * 0.3} opacity={0.15} />
       <Blob
-        color={C.purple}
-        size={280}
-        top={-60}
-        left={W * 0.3}
-        opacity={0.15}
-      />
-      <Blob
-        color={C.phBlue}
+        color="#000"
         size={180}
         top={H * 0.6}
         left={-60}
         opacity={0.12}
       />
       <Blob
-        color={C.phRed}
+        color="#000"
         size={160}
         top={H * 0.65}
         left={W * 0.55}
         opacity={0.1}
       />
 
-      <View style={ss.slideMiddle}>
+      <View style={ss.slideMiddle} className='mb-8'>
         {candidate ? (
           <>
+            <Image
+              source={require('../../assets/images/Matyag-overlay.png')}
+              style={{
+                position: 'absolute',
+                top: 94,
+                alignSelf: 'center',
+                width: 200,
+                height: 200,
+                resizeMode: 'contain',
+                zIndex: 3
+              }}
+            />
             <Text style={ss.statementTop}>My chosen</Text>
-            <Text style={[ss.statementBig, {color: C.purple}]}>
-              Vice{'\n'}President
+            <Text
+              style={[
+                ss.statementBig,
+                {color: C.purple, fontSize: 40, lineHeight: 42}
+              ]}
+            >
+              Vice President
             </Text>
             <View style={[ss.photoBig, {borderColor: C.purple}]}>
               {candidate.profileSrc ? (
                 <Image
                   source={candidate.profileSrc as ImageSourcePropType}
-                  style={{width: '100%', height: '100%', resizeMode: 'cover'}}
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '170%',
+                    resizeMode: 'cover'
+                  }}
                 />
               ) : (
                 <View
@@ -289,7 +342,7 @@ function SlideVP({
           </>
         ) : (
           <View style={ss.emptySlide}>
-            <Ionicons name="star-outline" size={64} color={C.mutedDark} />
+            <Ionicons name="shield-outline" size={64} color={C.mutedDark} />
             <Text style={ss.emptyText}>No Vice President{'\n'}Selected</Text>
           </View>
         )}
@@ -335,16 +388,16 @@ function SlideAllBallot({
 
   return (
     <View style={[ss.slide, {backgroundColor: SLIDE_BG.all}]}>
-      <Blob color={C.amber} size={220} top={-50} left={-60} opacity={0.15} />
+      <Blob color="#000" size={220} top={-50} left={-60} opacity={0.15} />
       <Blob
-        color={C.phRed}
+        color="#000"
         size={180}
         top={H * 0.5}
         left={W * 0.55}
         opacity={0.1}
       />
       <Blob
-        color={C.phBlue}
+        color="#000"
         size={160}
         top={H * 0.7}
         left={-30}
@@ -355,49 +408,84 @@ function SlideAllBallot({
         style={{
           flex: 1,
           width: '100%',
-          paddingHorizontal: 28,
-          paddingTop: 106,
-          paddingBottom: 8,
-          gap: 14
+          paddingHorizontal: 30,
+          paddingTop: 98,
+          paddingBottom: 10,
+          gap: 16
         }}
       >
-        <View>
-          <Text
-            style={[
-              ss.listTitle,
-              {color: C.amber, fontSize: 15, lineHeight: 17}
-            ]}
-          >
-            My Complete
-          </Text>
-          <Text
-            style={[
-              ss.listTitleBig,
-              {fontSize: 24, lineHeight: 26, marginBottom: 0}
-            ]}
-          >
-            Ballot 🗳️
-          </Text>
+        <View
+          style={{
+            position: 'relative',
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'flex-end',
+            paddingBottom: 10
+          }}
+        >
+          <View>
+            <Text
+              style={[
+                ss.listTitle,
+                {
+                  color: C.amber,
+                  fontSize: 18,
+                  lineHeight: 20,
+                  marginTop: 10,
+                  marginBottom: 2
+                }
+              ]}
+            >
+              My Complete
+            </Text>
+            <Text
+              style={[
+                ss.listTitleBig,
+                {fontSize: 38, lineHeight: 40, marginBottom: 2}
+              ]}
+            >
+              Ballot 🗳️
+            </Text>
+          </View>
+          <Image
+            source={require('../../assets/images/Matyag-overlay.png')}
+            style={{
+              position: 'absolute',
+              right: -58,
+              top: -45,
+              width: 180,
+              height: 180,
+              resizeMode: 'contain',
+              opacity: 0.9
+            }}
+          />
         </View>
 
         {/* President + VP */}
-        <View style={{flexDirection: 'row', gap: 10}}>
+        <View style={{flexDirection: 'row', gap: 12}}>
           <View style={{flex: 1}}>
             <View
               style={{
                 aspectRatio: 0.82,
-                borderRadius: 12,
+                borderRadius: 14,
                 overflow: 'hidden',
                 backgroundColor: C.gold + '20',
                 borderWidth: 1.5,
                 borderColor: C.gold + '50',
-                marginBottom: 5
+                marginBottom: 6
               }}
             >
               {president?.profileSrc ? (
                 <Image
                   source={president.profileSrc as ImageSourcePropType}
-                  style={{width: '100%', height: '100%', resizeMode: 'cover'}}
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '125%',
+                    resizeMode: 'cover'
+                  }}
                 />
               ) : (
                 <View
@@ -422,18 +510,18 @@ function SlideAllBallot({
             </View>
             <Text
               style={{
-                fontSize: 8,
+                fontSize: 12,
                 fontWeight: '800',
                 color: C.gold,
-                letterSpacing: 1.5,
+                letterSpacing: 1.2,
                 textTransform: 'uppercase',
-                marginBottom: 1
+                marginBottom: 2
               }}
             >
               President
             </Text>
             <Text
-              style={{fontSize: 12, fontWeight: '900', color: C.white}}
+              style={{fontSize: 16, fontWeight: '900', color: C.white}}
               numberOfLines={1}
             >
               {president?.fullName.trim().split(' ').slice(-1)[0] ?? '—'}
@@ -444,18 +532,25 @@ function SlideAllBallot({
             <View
               style={{
                 aspectRatio: 0.82,
-                borderRadius: 12,
+                borderRadius: 14,
                 overflow: 'hidden',
                 backgroundColor: C.purple + '20',
                 borderWidth: 1.5,
                 borderColor: C.purple + '50',
-                marginBottom: 5
+                marginBottom: 6
               }}
             >
               {vp?.profileSrc ? (
                 <Image
                   source={vp.profileSrc as ImageSourcePropType}
-                  style={{width: '100%', height: '100%', resizeMode: 'cover'}}
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '125%',
+                    resizeMode: 'cover'
+                  }}
                 />
               ) : (
                 <View
@@ -480,18 +575,18 @@ function SlideAllBallot({
             </View>
             <Text
               style={{
-                fontSize: 8,
+                fontSize: 12,
                 fontWeight: '800',
                 color: C.purple,
-                letterSpacing: 1.5,
+                letterSpacing: 1.2,
                 textTransform: 'uppercase',
-                marginBottom: 1
+                marginBottom: 2
               }}
             >
               Vice President
             </Text>
             <Text
-              style={{fontSize: 12, fontWeight: '900', color: C.white}}
+              style={{fontSize: 16, fontWeight: '900', color: C.white}}
               numberOfLines={1}
             >
               {vp?.fullName.trim().split(' ').slice(-1)[0] ?? '—'}
@@ -503,12 +598,12 @@ function SlideAllBallot({
         {senators.length > 0 && (
           <View>
             <View
-              style={[ss.listSectionHeader, {marginTop: 0, marginBottom: 5}]}
+              style={[ss.listSectionHeader, {marginTop: 2, marginBottom: 8}]}
             >
               <View
                 style={{
-                  width: 3,
-                  height: 12,
+                  width: 4,
+                  height: 13,
                   backgroundColor: C.blue,
                   borderRadius: 2
                 }}
@@ -517,8 +612,8 @@ function SlideAllBallot({
                 Senators
               </Text>
             </View>
-            <View style={{flexDirection: 'row', gap: 24}}>
-              <View style={{flex: 1, gap: 2}}>
+            <View style={{flexDirection: 'row', gap: 20}}>
+              <View style={{flex: 1, gap: 3}}>
                 {senators.slice(0, 6).map((sen, i) => (
                   <View
                     key={sen.id}
@@ -526,7 +621,7 @@ function SlideAllBallot({
                   >
                     <Text
                       style={{
-                        fontSize: 10,
+                        fontSize: 14,
                         fontWeight: '900',
                         color: C.blue,
                         width: 16
@@ -535,7 +630,7 @@ function SlideAllBallot({
                       {i + 1}
                     </Text>
                     <Text
-                      style={{fontSize: 12, fontWeight: '700', color: C.white}}
+                      style={{fontSize: 15, fontWeight: '800', color: C.white}}
                       numberOfLines={1}
                     >
                       {sen.fullName.split(' ')[0]}
@@ -544,7 +639,7 @@ function SlideAllBallot({
                 ))}
               </View>
               {senators.length > 6 && (
-                <View style={{flex: 1, gap: 2}}>
+                <View style={{flex: 1, gap: 3}}>
                   {senators.slice(6, 12).map((sen, i) => (
                     <View
                       key={sen.id}
@@ -556,7 +651,7 @@ function SlideAllBallot({
                     >
                       <Text
                         style={{
-                          fontSize: 10,
+                          fontSize: 14,
                           fontWeight: '900',
                           color: C.blue,
                           width: 16
@@ -566,8 +661,8 @@ function SlideAllBallot({
                       </Text>
                       <Text
                         style={{
-                          fontSize: 12,
-                          fontWeight: '700',
+                          fontSize: 15,
+                          fontWeight: '800',
                           color: C.white
                         }}
                         numberOfLines={1}
@@ -586,12 +681,12 @@ function SlideAllBallot({
         {partylist.length > 0 && (
           <View>
             <View
-              style={[ss.listSectionHeader, {marginTop: 0, marginBottom: 5}]}
+              style={[ss.listSectionHeader, {marginTop: 2, marginBottom: 8}]}
             >
               <View
                 style={{
-                  width: 3,
-                  height: 12,
+                  width: 4,
+                  height: 13,
                   backgroundColor: C.green,
                   borderRadius: 2
                 }}
@@ -603,7 +698,7 @@ function SlideAllBallot({
             <View style={{flexDirection: 'row', gap: 8, alignItems: 'center'}}>
               <Text
                 style={{
-                  fontSize: 10,
+                  fontSize: 14,
                   fontWeight: '900',
                   color: C.green,
                   width: 16
@@ -612,7 +707,7 @@ function SlideAllBallot({
                 1
               </Text>
               <Text
-                style={{fontSize: 12, fontWeight: '700', color: C.white}}
+                style={{fontSize: 15, fontWeight: '800', color: C.white}}
                 numberOfLines={1}
               >
                 {partylist[0].fullName.trim().split(' ').slice(-1)[0]}
@@ -785,7 +880,7 @@ function BallotWrappedStory({
         {/* Close button */}
         <Pressable
           onPress={onClose}
-          style={[ps.closeBtn, {top: insets.top + 10}]}
+          style={[ps.closeBtn, {top: insets.top + 20}]}
         >
           <Ionicons name="close" size={20} color={C.white} />
         </Pressable>
@@ -1157,7 +1252,6 @@ function PositionTab({
   limit: number;
   onPress: () => void;
 }) {
-  const accent = POSITION_ACCENT[position];
   const icon = POSITION_ICON[position];
   const isDone = filled === limit;
   return (
@@ -1168,16 +1262,16 @@ function PositionTab({
           backgroundColor: isActive
             ? '#1e293b'
             : isDone
-              ? accent + '20'
+              ? '#e2e8f0'
               : '#f1f5f9',
           borderWidth: isActive ? 0 : isDone ? 2 : 0,
-          borderColor: accent
+          borderColor: '#1e293b'
         }}
       >
         <Ionicons
           name={icon as any}
           size={20}
-          color={isActive ? 'white' : isDone ? accent : '#94a3b8'}
+          color={isActive ? 'white' : isDone ? '#1e293b' : '#94a3b8'}
         />
         {isDone && !isActive && (
           <View className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-emerald-500 items-center justify-center border-2 border-white">
@@ -1186,7 +1280,7 @@ function PositionTab({
         )}
       </View>
       <Text
-        className="text-[9px] font-bold text-center tracking-wide"
+        className="text-[10px] font-bold text-center tracking-wide"
         style={{color: isActive ? '#1e293b' : '#94a3b8'}}
       >
         {POSITION_SHORT[position]}
@@ -1221,21 +1315,27 @@ function BallotCard({
       onPress={onPress}
       className="bg-white rounded-3xl overflow-hidden"
       style={{
-        shadowColor: '#000',
-        shadowOpacity: 0.08,
-        shadowRadius: 16,
-        shadowOffset: {width: 0, height: 4},
-        elevation: 4
+        height: BALLOT_CARD_HEIGHT,
+        borderWidth: 1,
+        borderColor: '#e2e8f0',
+        ...CARD_SURFACE
       }}
     >
       <View
-        className="relative"
+        className="relative overflow-hidden"
         style={{height: 180, backgroundColor: accent + '15'}}
       >
         {entry.profileSrc ? (
           <Image
             source={entry.profileSrc as ImageSourcePropType}
-            style={{width: '100%', height: 180, resizeMode: 'cover'}}
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '130%',
+              resizeMode: 'cover'
+            }}
           />
         ) : (
           <View className="flex-1 items-center justify-center">
@@ -1247,10 +1347,6 @@ function BallotCard({
             </Text>
           </View>
         )}
-        <View
-          className="absolute bottom-0 left-0 right-0"
-          style={{height: 60, backgroundColor: 'rgba(0,0,0,0.3)'}}
-        />
         <View
           className="absolute bottom-3 left-3.5 rounded-full px-2.5 py-0.5"
           style={{backgroundColor: accent}}
@@ -1270,7 +1366,7 @@ function BallotCard({
       </View>
       <View className="p-3.5">
         <Text
-          className="text-[18px] font-black text-slate-900 mb-2.5"
+          className="text-[17px] font-black text-slate-900 mb-2.5"
           style={{letterSpacing: -0.3}}
           numberOfLines={1}
         >
@@ -1295,15 +1391,6 @@ function BallotCard({
           </View>
         </View>
         <View className="h-px bg-slate-100 mb-2" />
-        <View className="flex-row items-center gap-1.5">
-          <Ionicons name="wallet-outline" size={12} color="#94a3b8" />
-          <Text className="text-[11px] text-slate-400">
-            Net Worth:{' '}
-            <Text className="text-slate-600 font-semibold">
-              {entry.netWorthLabel}
-            </Text>
-          </Text>
-        </View>
       </View>
     </Pressable>
   );
@@ -1324,11 +1411,11 @@ function EmptySlot({
       onPress={onPress}
       className="rounded-3xl items-center justify-center gap-2.5"
       style={{
-        height: 317,
+        height: BALLOT_CARD_HEIGHT,
         borderWidth: 2,
         borderStyle: 'dashed',
         borderColor: accent + '50',
-        backgroundColor: accent + '06'
+        backgroundColor: accent + '08'
       }}
     >
       <View
@@ -1396,9 +1483,13 @@ export default function BallotScreen() {
   const activeEntries = ballot[activePos];
   const activeLimit = BALLOT_LIMITS[activePos];
   const activeAccent = POSITION_ACCENT[activePos];
+  const isSingleSeatPosition =
+    activePos === 'President' || activePos === 'Vice President';
+  const cardWidth = isSingleSeatPosition ? W - 32 : 260;
 
   return (
-    <SafeAreaView className="flex-1 bg-slate-50">
+    <View className="flex-1 bg-slate-50">
+      <StatusBar barStyle="dark-content" backgroundColor="#f8fafc" />
       <ConfirmModal config={modal} onClose={closeModal} />
       <BallotWrappedStory
         visible={wrappedVisible}
@@ -1410,16 +1501,22 @@ export default function BallotScreen() {
       />
 
       {/* ── Header ── */}
-      <View className="bg-white px-5 pt-4 pb-0 border-b border-slate-100">
+      <View className="bg-white pt-14 pb-5 px-5 border-b border-slate-100">
+        <View className="flex-row items-center gap-2 mb-4">
+          <View className="w-7 h-7 rounded items-center justify-center">
+              <Image
+                source={require('../../assets/images/Matyag-no-bg-no-text.png')}
+                style={{width: 54, height: 54, resizeMode: 'contain'}}
+              />
+            </View>
+            <Text className="text-[31px] pl-2 font-black text-slate-800 tracking-tight">
+              Matyag
+            </Text>
+        </View>
+
         <View className="flex-row items-center justify-between mb-4">
           <View>
-            <Text
-              className="text-[22px] font-black text-slate-900"
-              style={{letterSpacing: -0.5}}
-            >
-              National Ballot
-            </Text>
-            <Text className="text-[12px] text-slate-400 mt-0.5">
+            <Text className="text-[14px] text-slate-600 mb-1">
               {filledSlots === 0
                 ? 'Add candidates to your personal ballot'
                 : `${filledSlots} of ${totalSlots} positions filled`}
@@ -1428,7 +1525,7 @@ export default function BallotScreen() {
           {filledSlots > 0 && (
             <Pressable
               onPress={handleClear}
-              className="px-3 py-1.5 rounded-full bg-red-50"
+              className="px-3.5 py-1.5 rounded-full bg-red-50 border border-red-100"
             >
               <Text className="text-[12px] font-bold text-red-500">
                 Clear All
@@ -1489,7 +1586,7 @@ export default function BallotScreen() {
                       ballot[pos].length === BALLOT_LIMITS[pos] &&
                       ballot[POSITION_ORDER[index + 1]].length ===
                         BALLOT_LIMITS[POSITION_ORDER[index + 1]]
-                        ? '#10b981'
+                        ? '#1e293b'
                         : ballot[pos].length === BALLOT_LIMITS[pos]
                           ? '#1e293b'
                           : '#e2e8f0'
@@ -1527,7 +1624,7 @@ export default function BallotScreen() {
       ) : (
         <ScrollView
           className="flex-1"
-          contentContainerStyle={{padding: 16, paddingBottom: 220}}
+          contentContainerStyle={{padding: 16, paddingBottom: 132}}
           showsVerticalScrollIndicator={false}
         >
           <View className="flex-row items-center justify-between mb-3">
@@ -1554,11 +1651,11 @@ export default function BallotScreen() {
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{gap: 12, paddingRight: 4, paddingBottom: 4}}
+            contentContainerStyle={{gap: 14, paddingRight: 4, paddingBottom: 4}}
             className="mb-3"
           >
             {activeEntries.map(entry => (
-              <View key={entry.id} style={{width: 260}}>
+              <View key={entry.id} style={{width: cardWidth}}>
                 <BallotCard
                   entry={entry}
                   accent={activeAccent}
@@ -1568,7 +1665,7 @@ export default function BallotScreen() {
               </View>
             ))}
             {activeEntries.length < activeLimit && (
-              <View style={{width: 260}}>
+              <View style={{width: cardWidth}}>
                 <EmptySlot
                   position={activePos}
                   onPress={() => handleAddPosition(activePos)}
@@ -1579,7 +1676,7 @@ export default function BallotScreen() {
           </ScrollView>
 
           {completionPct === 100 && (
-            <View className="rounded-2xl p-5 items-center bg-slate-800 mt-2">
+            <View className="rounded-3xl p-5 items-center bg-slate-800 mt-2">
               <Ionicons name="checkmark-circle" size={32} color="#10b981" />
               <Text className="text-white font-black text-[16px] mt-2">
                 Ballot Complete!
@@ -1589,26 +1686,22 @@ export default function BallotScreen() {
               </Text>
             </View>
           )}
+
+          {filledSlots > 0 && (
+            <View className="mt-3 pt-3">
+              <Pressable
+                onPress={() => setWrappedVisible(true)}
+                className="flex-row items-center justify-center gap-2 py-4 rounded-2xl bg-slate-800"
+              >
+                <Ionicons name="share-outline" size={18} color="white" />
+                <Text className="text-[15px] font-bold text-white tracking-wide">
+                  Share Ballot Wrapped
+                </Text>
+              </Pressable>
+            </View>
+          )}
         </ScrollView>
       )}
-
-      {/* ── Share Ballot Wrapped button ── */}
-      {filledSlots > 0 && (
-        <View
-          className="absolute bottom-0 left-0 right-0 px-5 pt-3 bg-white border-t border-slate-100"
-          style={{paddingBottom: 120}}
-        >
-          <Pressable
-            onPress={() => setWrappedVisible(true)}
-            className="flex-row items-center justify-center gap-2 py-4 rounded-full bg-slate-800"
-          >
-            <Ionicons name="share-outline" size={18} color="white" />
-            <Text className="text-[15px] font-bold text-white tracking-wide">
-              Share Ballot Wrapped
-            </Text>
-          </Pressable>
-        </View>
-      )}
-    </SafeAreaView>
+    </View>
   );
 }
