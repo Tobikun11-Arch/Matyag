@@ -531,17 +531,21 @@ function AccountabilityRow({a, b}: {a: Politician; b: Politician}) {
       }}
     >
       <SectionLabel label="Accountability Flags" />
-      <View className="flex-row justify-between gap-3">
-        <FlagBadge
-          p={a}
-          expanded={expandedA}
-          onToggle={() => setExpandedA(v => !v)}
-        />
-        <FlagBadge
-          p={b}
-          expanded={expandedB}
-          onToggle={() => setExpandedB(v => !v)}
-        />
+      <View className="flex-row items-start gap-3">
+        <View className="flex-1">
+          <FlagBadge
+            p={a}
+            expanded={expandedA}
+            onToggle={() => setExpandedA(v => !v)}
+          />
+        </View>
+        <View className="flex-1 items-end">
+          <FlagBadge
+            p={b}
+            expanded={expandedB}
+            onToggle={() => setExpandedB(v => !v)}
+          />
+        </View>
       </View>
     </View>
   );

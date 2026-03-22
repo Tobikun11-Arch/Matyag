@@ -2,7 +2,7 @@ import {DarkTheme, DefaultTheme, ThemeProvider} from '@react-navigation/native';
 import {Stack} from 'expo-router';
 import {StatusBar} from 'expo-status-bar';
 import 'react-native-reanimated';
-
+import {BallotProvider} from '@/hooks/BallotContext';
 import {useColorScheme} from '@/hooks/use-color-scheme';
 
 export const unstable_settings = {
@@ -14,6 +14,7 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+        <BallotProvider>
       <Stack>
         <Stack.Screen name="(tabs)" options={{headerShown: false}} />
         <Stack.Screen
@@ -22,6 +23,7 @@ export default function RootLayout() {
         />
         <Stack.Screen name="politician/[id]" options={{headerShown: false}} />
       </Stack>
+      </BallotProvider>
       <StatusBar style="auto" />
     </ThemeProvider>
   );
