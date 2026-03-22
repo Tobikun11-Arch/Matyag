@@ -1,130 +1,314 @@
-import React from 'react';
-import {ScrollView, View, Text, Pressable} from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
+import React, {useState} from 'react';
 import {
-  Zap,
-  AlertTriangle,
-  CheckCircle
-} from 'lucide-react-native';
+  ScrollView,
+  View,
+  Text,
+  Pressable,
+  Image,
+  Modal,
+  FlatList,
+  TextInput
+} from 'react-native';
+import {SafeAreaView} from 'react-native-safe-area-context';
+import {Zap, AlertTriangle, CheckCircle, X, Search} from 'lucide-react-native';
+import {useRouter} from 'expo-router';
+import {Ionicons} from '@expo/vector-icons';
+import {
+  allPoliticians,
+  type Politician,
+  type Position
+} from '@/constants/dataset';
 
-// ── Types ────────────────────────────────────────────────────────────────────
-interface Candidate {
-  name: string;
-  title: string;
-  termYears: number;
-  billsAuthored: number;
-  attendanceRate: number;
-  declaredAssets: string;
-  assetYear: string;
-  accountabilityFlags: {count: number; status: 'pending' | 'clear'};
-}
+// ─── Position filter config ───────────────────────────────────────────────────
+const POSITION_FILTERS: {label: string; value: Position | 'All'}[] = [
+  {label: 'All', value: 'All'},
+  {label: 'President', value: 'President'},
+  {label: 'Vice President', value: 'Vice President'},
+  {label: 'Senator', value: 'Senator'},
+  {label: 'Party-list', value: 'Party-list'}
+];
 
-// ── Mock Data ────────────────────────────────────────────────────────────────
-const CANDIDATE_A: Candidate = {
-  name: 'Juan Dela Cruz',
-  title: 'Senator',
-  termYears: 12,
-  billsAuthored: 142,
-  attendanceRate: 94,
-  declaredAssets: '₱45.2M',
-  assetYear: '2023 Filing',
-  accountabilityFlags: {count: 2, status: 'pending'}
+const POSITION_COLORS: Record<
+  Position,
+  {bg: string; text: string; dot: string}
+> = {
+  President: {bg: 'bg-amber-100', text: 'text-amber-700', dot: 'bg-amber-500'},
+  'Vice President': {
+    bg: 'bg-purple-100',
+    text: 'text-purple-700',
+    dot: 'bg-purple-500'
+  },
+  Senator: {bg: 'bg-blue-100', text: 'text-blue-700', dot: 'bg-blue-500'},
+  'Party-list': {
+    bg: 'bg-emerald-100',
+    text: 'text-emerald-700',
+    dot: 'bg-emerald-500'
+  }
 };
 
-const CANDIDATE_B: Candidate = {
-  name: 'Maria Clara',
-  title: 'Senator',
-  termYears: 6,
-  billsAuthored: 89,
-  attendanceRate: 98,
-  declaredAssets: '₱12.8M',
-  assetYear: '2023 Filing',
-  accountabilityFlags: {count: 0, status: 'clear'}
-};
+// ─────────────────────────────────────────────────────────────────────────────
+// PICKER MODAL
+// ─────────────────────────────────────────────────────────────────────────────
+function PickerModal({
+  visible,
+  onClose,
+  onSelect,
+  exclude
+}: {
+  visible: boolean;
+  onClose: () => void;
+  onSelect: (p: Politician) => void;
+  exclude?: string;
+}) {
+  const [query, setQuery] = useState('');
+  const [filter, setFilter] = useState<Position | 'All'>('All');
 
-// ── Sub-components ───────────────────────────────────────────────────────────
+  const filtered = allPoliticians.filter(p => {
+    if (p.id === exclude) return false;
+    const q = query.toLowerCase();
+    const matchesQuery =
+      q === '' ||
+      p.fullName.toLowerCase().includes(q) ||
+      p.position.toLowerCase().includes(q);
+    const matchesFilter = filter === 'All' || p.position === filter;
+    return matchesQuery && matchesFilter;
+  });
 
-function AvatarPlaceholder({side}: {side: 'left' | 'right'}) {
   return (
-    <View
-      className="rounded-full bg-gray-200 border-2 border-white items-center justify-center"
-      style={{width: 72, height: 72}}
-    />
-  );
-}
-
-function CandidateHeader({a, b}: {a: Candidate; b: Candidate}) {
-  return (
-    <View
-      className="mx-4 mt-4 rounded-3xl overflow-hidden"
-      style={{backgroundColor: '#1A1F36'}}
+    <Modal
+      visible={visible}
+      animationType="slide"
+      presentationStyle="pageSheet"
     >
-      {/* gradient-ish top band */}
-      <View className="px-6 pt-6 pb-8">
-        <View className="flex-row items-center justify-between">
-          {/* Left candidate */}
-          <View className="items-center flex-1">
-            <View className="relative">
-              <AvatarPlaceholder side="left" />
-              <View
-                className="absolute -bottom-2 -right-2 rounded-full items-center justify-center"
-                style={{backgroundColor: '#F59E0B', width: 22, height: 22}}
-              >
-                <Text style={{color: '#fff', fontSize: 10, fontWeight: '700'}}>
-                  A
-                </Text>
-              </View>
-            </View>
-            <Text className="text-white text-xs mt-3 opacity-60">
-              {a.title}
-            </Text>
-            <Text className="text-white text-sm font-bold text-center mt-0.5">
-              {a.name}
-            </Text>
-          </View>
-
-          {/* VS badge */}
-          <View
-            className="rounded-full items-center justify-center mx-3"
-            style={{backgroundColor: '#F59E0B', width: 36, height: 36}}
+      <SafeAreaView className="flex-1 bg-white">
+        {/* Header */}
+        <View className="flex-row items-center justify-between px-5 py-4 border-b border-slate-100">
+          <Text className="text-[17px] font-bold text-slate-800">
+            Select Politician
+          </Text>
+          <Pressable
+            onPress={onClose}
+            className="w-8 h-8 items-center justify-center"
           >
-            <Text style={{color: '#1A1F36', fontSize: 11, fontWeight: '800'}}>
-              VS
-            </Text>
-          </View>
+            <X size={20} color="#64748b" />
+          </Pressable>
+        </View>
 
-          {/* Right candidate */}
-          <View className="items-center flex-1">
-            <View className="relative">
-              <AvatarPlaceholder side="right" />
+        {/* Search */}
+        <View className="px-4 py-3">
+          <View className="flex-row items-center bg-slate-100 rounded-xl px-3 h-11">
+            <Search size={16} color="#94a3b8" />
+            <View className="flex-1 ml-2">
+              <Text className="text-[14px] text-slate-700" onPress={() => {}} />
+              {/* RN TextInput workaround */}
               <View
-                className="absolute -bottom-2 -right-2 rounded-full items-center justify-center"
-                style={{backgroundColor: '#6366F1', width: 22, height: 22}}
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0
+                }}
               >
-                <Text style={{color: '#fff', fontSize: 10, fontWeight: '700'}}>
-                  B
-                </Text>
+                {React.createElement(TextInput, {
+                  className: 'flex-1 text-[14px] text-slate-700',
+                  placeholder: 'Search by name...',
+                  placeholderTextColor: '#94a3b8',
+                  value: query,
+                  onChangeText: setQuery
+                })}
               </View>
             </View>
-            <Text className="text-white text-xs mt-3 opacity-60">
-              {b.title}
-            </Text>
-            <Text className="text-white text-sm font-bold text-center mt-0.5">
-              {b.name}
-            </Text>
+            {query.length > 0 && (
+              <Pressable onPress={() => setQuery('')}>
+                <Ionicons name="close-circle" size={17} color="#94a3b8" />
+              </Pressable>
+            )}
           </View>
         </View>
-      </View>
-    </View>
+
+        {/* Position filter chips */}
+        <View style={{height: 44}}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            className="px-4 mb-2"
+            style={{maxHeight: 40, flexGrow: 0}}
+            contentContainerStyle={{
+              gap: 8,
+              paddingRight: 16,
+              alignItems: 'center'
+            }}
+          >
+            {POSITION_FILTERS.map(f => {
+              const active = filter === f.value;
+              return (
+                <Pressable
+                  key={f.value}
+                  onPress={() => setFilter(f.value as Position | 'All')}
+                  className={`px-3 py-1.5 rounded-full border ${
+                    active
+                      ? 'bg-[#1e293b] border-[#1e293b]'
+                      : 'bg-white border-slate-200'
+                  }`}
+                >
+                  <Text
+                    className={`text-[12px] font-medium ${active ? 'text-white' : 'text-slate-600'}`}
+                  >
+                    {f.label}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </ScrollView>
+        </View>
+
+        {/* List */}
+        <FlatList
+          data={filtered}
+          keyExtractor={item => item.id}
+          contentContainerStyle={{paddingBottom: 40}}
+          ItemSeparatorComponent={() => (
+            <View className="h-px bg-slate-100 mx-5" />
+          )}
+          renderItem={({item}) => {
+            const colors = POSITION_COLORS[item.position];
+            const initials = `${item.firstName[0]}${item.lastName[0]}`;
+            return (
+              <Pressable
+                onPress={() => {
+                  onSelect(item);
+                  onClose();
+                }}
+                className="flex-row items-center px-5 py-3 active:bg-slate-50"
+              >
+                <View className="w-12 h-12 rounded-full bg-slate-200 overflow-hidden items-center justify-center mr-3">
+                  {item.profileSrc ? (
+                    <Image
+                      source={item.profileSrc}
+                      style={{
+                        width: 48, // ← match container exactly
+                        height: 68,
+                        resizeMode: 'cover',
+                        marginBottom: -20
+                      }}
+                    />
+                  ) : (
+                    <Text className="text-slate-500 font-bold">{initials}</Text>
+                  )}
+                </View>
+                <View className="flex-1">
+                  <Text
+                    className="text-[14px] font-semibold text-slate-800"
+                    numberOfLines={1}
+                  >
+                    {item.honorific} {item.fullName}
+                  </Text>
+                  <View
+                    className={`self-start flex-row items-center px-2 py-0.5 rounded-full mt-1 ${colors.bg}`}
+                  >
+                    <View
+                      className={`w-1.5 h-1.5 rounded-full mr-1 ${colors.dot}`}
+                    />
+                    <Text className={`text-[10px] font-medium ${colors.text}`}>
+                      {item.position}
+                    </Text>
+                  </View>
+                </View>
+                <Ionicons name="chevron-forward" size={16} color="#cbd5e1" />
+              </Pressable>
+            );
+          }}
+        />
+      </SafeAreaView>
+    </Modal>
   );
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// CANDIDATE SLOT
+// ─────────────────────────────────────────────────────────────────────────────
+function CandidateSlot({
+  politician,
+  badge,
+  badgeColor,
+  onPress
+}: {
+  politician: Politician | null;
+  badge: string;
+  badgeColor: string;
+  onPress: () => void;
+}) {
+  if (!politician) {
+    return (
+      <Pressable onPress={onPress} className="flex-1 items-center">
+        <View
+          className="rounded-full border-2 border-dashed border-slate-500 items-center justify-center"
+          style={{width: 72, height: 72}}
+        >
+          <Ionicons name="add" size={24} color="#94a3b8" />
+        </View>
+        <Text className="text-slate-400 text-[11px] mt-2">Tap to select</Text>
+      </Pressable>
+    );
+  }
+
+  const initials = `${politician.firstName[0]}${politician.lastName[0]}`;
+
+  return (
+    <Pressable onPress={onPress} className="flex-1 items-center">
+      <View className="relative">
+        <View
+          className="rounded-full overflow-hidden border-2 border-white"
+          style={{width: 72, height: 72, backgroundColor: '#334155'}}
+        >
+          {politician.profileSrc ? (
+            <Image
+              source={politician.profileSrc}
+              style={{
+                width: 72, // ← already correct here
+                height: 100,
+                resizeMode: 'cover',
+                marginBottom: -28
+              }}
+            />
+          ) : (
+            <View className="w-full h-full items-center justify-center">
+              <Text style={{color: 'white', fontWeight: '700', fontSize: 22}}>
+                {initials}
+              </Text>
+            </View>
+          )}
+        </View>
+        {/* Badge */}
+        <View
+          className="absolute -bottom-1 -right-1 rounded-full items-center justify-center border-2 border-[#1A1F36]"
+          style={{backgroundColor: badgeColor, width: 22, height: 22}}
+        >
+          <Text style={{color: '#fff', fontSize: 10, fontWeight: '800'}}>
+            {badge}
+          </Text>
+        </View>
+      </View>
+      <Text className="text-white text-[10px] mt-2 opacity-60">
+        {politician.position}
+      </Text>
+      <Text
+        className="text-white text-[12px] font-bold text-center mt-0.5"
+        numberOfLines={2}
+      >
+        {politician.fullName}
+      </Text>
+    </Pressable>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// STAT ROWS
+// ─────────────────────────────────────────────────────────────────────────────
 function SectionLabel({label}: {label: string}) {
   return (
-    <Text
-      className="text-center text-xs font-semibold tracking-widest uppercase mb-3"
-      style={{color: '#9CA3AF'}}
-    >
+    <Text className="text-center text-[11px] font-semibold tracking-widest uppercase mb-3 text-slate-400">
       {label}
     </Text>
   );
@@ -136,14 +320,16 @@ function StatRow({
   right,
   leftSub,
   rightSub,
-  leftHighlight
+  leftWins,
+  rightWins
 }: {
   label: string;
   left: string;
   right: string;
   leftSub?: string;
   rightSub?: string;
-  leftHighlight?: boolean;
+  leftWins?: boolean;
+  rightWins?: boolean;
 }) {
   return (
     <View
@@ -161,30 +347,45 @@ function StatRow({
         <View className="flex-1 items-start">
           <Text
             style={{
-              fontSize: 28,
+              fontSize: 26,
               fontWeight: '800',
-              color: leftHighlight ? '#1A1F36' : '#1A1F36'
+              color: leftWins ? '#1A1F36' : '#94a3b8'
             }}
           >
             {left}
           </Text>
           {leftSub && (
-            <Text className="text-xs mt-0.5" style={{color: '#9CA3AF'}}>
-              {leftSub}
-            </Text>
+            <Text className="text-[11px] mt-0.5 text-slate-400">{leftSub}</Text>
+          )}
+          {leftWins && (
+            <View className="mt-1 px-2 py-0.5 rounded-full bg-amber-100">
+              <Text className="text-[10px] font-bold text-amber-700">
+                HIGHER
+              </Text>
+            </View>
           )}
         </View>
         <View className="flex-1 items-end">
-          <Text style={{fontSize: 28, fontWeight: '800', color: '#1A1F36'}}>
+          <Text
+            style={{
+              fontSize: 26,
+              fontWeight: '800',
+              color: rightWins ? '#1A1F36' : '#94a3b8'
+            }}
+          >
             {right}
           </Text>
           {rightSub && (
-            <Text
-              className="text-xs mt-0.5 text-right"
-              style={{color: '#9CA3AF'}}
-            >
+            <Text className="text-[11px] mt-0.5 text-right text-slate-400">
               {rightSub}
             </Text>
+          )}
+          {rightWins && (
+            <View className="mt-1 px-2 py-0.5 rounded-full bg-indigo-100 self-end">
+              <Text className="text-[10px] font-bold text-indigo-700">
+                HIGHER
+              </Text>
+            </View>
           )}
         </View>
       </View>
@@ -192,7 +393,8 @@ function StatRow({
   );
 }
 
-function AttendanceRow({a, b}: {a: Candidate; b: Candidate}) {
+function AttendanceRow({a, b}: {a: Politician; b: Politician}) {
+  const aWins = a.attendanceRate >= b.attendanceRate;
   return (
     <View
       className="mx-4 mb-3 px-5 py-4 rounded-2xl bg-white"
@@ -206,19 +408,30 @@ function AttendanceRow({a, b}: {a: Candidate; b: Candidate}) {
     >
       <SectionLabel label="Attendance Rate" />
       <View className="flex-row justify-between items-end mb-3">
-        <Text style={{fontSize: 28, fontWeight: '800', color: '#1A1F36'}}>
+        <Text
+          style={{
+            fontSize: 26,
+            fontWeight: '800',
+            color: aWins ? '#1A1F36' : '#94a3b8'
+          }}
+        >
           {a.attendanceRate}%
         </Text>
-        <Text style={{fontSize: 28, fontWeight: '800', color: '#1A1F36'}}>
+        <Text
+          style={{
+            fontSize: 26,
+            fontWeight: '800',
+            color: !aWins ? '#1A1F36' : '#94a3b8'
+          }}
+        >
           {b.attendanceRate}%
         </Text>
       </View>
-      {/* Progress bars */}
       <View className="flex-row gap-3">
         <View className="flex-1 h-2 rounded-full bg-gray-100">
           <View
             className="h-2 rounded-full"
-            style={{width: `${a.attendanceRate}%`, backgroundColor: '#1A1F36'}}
+            style={{width: `${a.attendanceRate}%`, backgroundColor: '#F59E0B'}}
           />
         </View>
         <View className="flex-1 h-2 rounded-full bg-gray-100">
@@ -232,29 +445,77 @@ function AttendanceRow({a, b}: {a: Candidate; b: Candidate}) {
   );
 }
 
-function AccountabilityRow({a, b}: {a: Candidate; b: Candidate}) {
-  const FlagBadge = ({cand}: {cand: Candidate}) => {
-    const isPending = cand.accountabilityFlags.status === 'pending';
+function AccountabilityRow({a, b}: {a: Politician; b: Politician}) {
+  const [expandedA, setExpandedA] = useState(false);
+  const [expandedB, setExpandedB] = useState(false);
+
+  const FlagBadge = ({
+    p,
+    expanded,
+    onToggle
+  }: {
+    p: Politician;
+    expanded: boolean;
+    onToggle: () => void;
+  }) => {
+    const isPending = p.accountabilityFlags.status === 'pending';
+    const isDismissed = p.accountabilityFlags.status === 'dismissed';
+    const bgColor = isPending ? '#FEF3C7' : isDismissed ? '#FEF9C3' : '#ECFDF5';
+    const textColor = isPending
+      ? '#D97706'
+      : isDismissed
+        ? '#854d0e'
+        : '#10B981';
+    const label = isPending
+      ? `${p.accountabilityFlags.count} Pending`
+      : isDismissed
+        ? 'Dismissed'
+        : 'Clear';
+    const isClickable = p.accountabilityFlags.count > 0;
+
     return (
-      <View
-        className="flex-row items-center px-3 py-1.5 rounded-full gap-1.5"
-        style={{backgroundColor: isPending ? '#FEF3C7' : '#ECFDF5'}}
+      <Pressable
+        onPress={isClickable ? onToggle : undefined}
+        className="flex-1"
       >
-        {isPending ? (
-          <AlertTriangle size={13} color="#D97706" />
-        ) : (
-          <CheckCircle size={13} color="#10B981" />
-        )}
-        <Text
-          style={{
-            fontSize: 12,
-            fontWeight: '600',
-            color: isPending ? '#D97706' : '#10B981'
-          }}
+        <View
+          className="flex-row items-center px-3 py-1.5 rounded-full gap-1.5 self-start"
+          style={{backgroundColor: bgColor}}
         >
-          {isPending ? `${cand.accountabilityFlags.count} Pending` : 'Clear'}
-        </Text>
-      </View>
+          {isPending ? (
+            <AlertTriangle size={13} color={textColor} />
+          ) : (
+            <CheckCircle size={13} color={textColor} />
+          )}
+          <Text style={{fontSize: 12, fontWeight: '600', color: textColor}}>
+            {label}
+          </Text>
+          {isClickable && (
+            <Ionicons
+              name={expanded ? 'chevron-up' : 'chevron-down'}
+              size={12}
+              color={textColor}
+            />
+          )}
+        </View>
+
+        {/* Expanded details */}
+        {expanded && p.accountabilityFlags.details.length > 0 && (
+          <View className="mt-2 gap-2">
+            {p.accountabilityFlags.details.map((detail, i) => (
+              <View
+                key={i}
+                className="rounded-xl p-3"
+                style={{backgroundColor: bgColor}}
+              >
+                <Text style={{fontSize: 11, color: textColor, lineHeight: 16}}>
+                  {detail}
+                </Text>
+              </View>
+            ))}
+          </View>
+        )}
+      </Pressable>
     );
   };
 
@@ -270,15 +531,94 @@ function AccountabilityRow({a, b}: {a: Candidate; b: Candidate}) {
       }}
     >
       <SectionLabel label="Accountability Flags" />
-      <View className="flex-row justify-between items-center">
-        <FlagBadge cand={a} />
-        <FlagBadge cand={b} />
+      <View className="flex-row justify-between gap-3">
+        <FlagBadge
+          p={a}
+          expanded={expandedA}
+          onToggle={() => setExpandedA(v => !v)}
+        />
+        <FlagBadge
+          p={b}
+          expanded={expandedB}
+          onToggle={() => setExpandedB(v => !v)}
+        />
       </View>
     </View>
   );
 }
 
-function QuickInsight({a, b}: {a: Candidate; b: Candidate}) {
+function PlatformRow({a, b}: {a: Politician; b: Politician}) {
+  return (
+    <View
+      className="mx-4 mb-3 px-5 py-4 rounded-2xl bg-white"
+      style={{
+        shadowColor: '#000',
+        shadowOpacity: 0.06,
+        shadowRadius: 8,
+        shadowOffset: {width: 0, height: 2},
+        elevation: 2
+      }}
+    >
+      <SectionLabel label="Platform" />
+      <View className="flex-row justify-between gap-3">
+        <View className="flex-1 gap-2">
+          {a.platform.map((item, i) => (
+            <View key={i} className="bg-amber-50 px-2 py-1 rounded-lg">
+              <Text
+                className="text-[11px] font-semibold text-amber-700"
+                numberOfLines={1}
+              >
+                {item}
+              </Text>
+            </View>
+          ))}
+        </View>
+        <View className="flex-1 gap-2 items-end">
+          {b.platform.map((item, i) => (
+            <View key={i} className="bg-indigo-50 px-2 py-1 rounded-lg">
+              <Text
+                className="text-[11px] font-semibold text-indigo-700 text-right"
+                numberOfLines={1}
+              >
+                {item}
+              </Text>
+            </View>
+          ))}
+        </View>
+      </View>
+    </View>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// QUICK INSIGHT
+// ─────────────────────────────────────────────────────────────────────────────
+function QuickInsight({a, b}: {a: Politician; b: Politician}) {
+  const router = useRouter();
+
+  // Auto-generate insight
+  const aMore = a.billsAuthored > b.billsAuthored;
+  const bAttend = b.attendanceRate > a.attendanceRate;
+  const bClean =
+    b.accountabilityFlags.status === 'clear' &&
+    a.accountabilityFlags.status !== 'clear';
+  const aClean =
+    a.accountabilityFlags.status === 'clear' &&
+    b.accountabilityFlags.status !== 'clear';
+
+  let insight = '';
+  if (aMore && bAttend) {
+    insight = `${a.fullName} has authored more bills, but ${b.fullName} maintains a higher attendance rate.`;
+  } else if (bClean) {
+    insight = `${b.fullName} has a clean accountability record while ${a.fullName} has ${a.accountabilityFlags.count} pending flag${a.accountabilityFlags.count !== 1 ? 's' : ''}.`;
+  } else if (aClean) {
+    insight = `${a.fullName} has a clean accountability record while ${b.fullName} has ${b.accountabilityFlags.count} pending flag${b.accountabilityFlags.count !== 1 ? 's' : ''}.`;
+  } else if (a.lawsPassed > b.lawsPassed) {
+    insight = `${a.fullName} has passed more laws (${a.lawsPassed}) compared to ${b.fullName} (${b.lawsPassed}).`;
+  } else {
+    insight = `${a.fullName} has ${a.termExperienceYears} years of experience vs ${b.fullName}'s ${b.termExperienceYears} years.`;
+  }
+
   return (
     <View
       className="mx-4 mb-4 rounded-2xl px-5 py-4"
@@ -298,28 +638,31 @@ function QuickInsight({a, b}: {a: Candidate; b: Candidate}) {
         </Text>
       </View>
       <Text style={{color: '#E5E7EB', fontSize: 13, lineHeight: 20}}>
-        <Text style={{color: '#fff', fontWeight: '700'}}>{a.name}</Text> has 2×
-        the legislative output, but{' '}
-        <Text style={{color: '#fff', fontWeight: '700'}}>{b.name}</Text>{' '}
-        maintains a near-perfect attendance record and has zero accountability
-        flags.
+        {insight}
       </Text>
-
       <View className="flex-row gap-3 mt-4">
         <Pressable
           className="flex-1 items-center py-2.5 rounded-xl"
           style={{backgroundColor: '#2D3452'}}
+          onPress={() => router.push(`/politician/${a.id}`)}
         >
-          <Text style={{color: '#E5E7EB', fontSize: 13, fontWeight: '600'}}>
-            View Full Dossier
+          <Text
+            style={{color: '#E5E7EB', fontSize: 12, fontWeight: '600'}}
+            numberOfLines={1}
+          >
+            View {a.firstName}
           </Text>
         </Pressable>
         <Pressable
           className="flex-1 items-center py-2.5 rounded-xl"
           style={{backgroundColor: '#F59E0B'}}
+          onPress={() => router.push(`/politician/${b.id}`)}
         >
-          <Text style={{color: '#1A1F36', fontSize: 13, fontWeight: '700'}}>
-            Download Report
+          <Text
+            style={{color: '#1A1F36', fontSize: 12, fontWeight: '700'}}
+            numberOfLines={1}
+          >
+            View {b.firstName}
           </Text>
         </Pressable>
       </View>
@@ -327,45 +670,180 @@ function QuickInsight({a, b}: {a: Candidate; b: Candidate}) {
   );
 }
 
-// ── Main Screen ───────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// EMPTY COMPARE STATE
+// ─────────────────────────────────────────────────────────────────────────────
+function EmptyCompare({
+  onSelectA,
+  onSelectB
+}: {
+  onSelectA: () => void;
+  onSelectB: () => void;
+}) {
+  return (
+    <View className="flex-1 items-center justify-center px-8 py-20">
+      <View className="w-16 h-16 rounded-full bg-slate-100 items-center justify-center mb-4">
+        <Ionicons name="git-compare-outline" size={32} color="#94a3b8" />
+      </View>
+      <Text className="text-[17px] font-bold text-slate-700 text-center mb-2">
+        Compare Politicians
+      </Text>
+      <Text className="text-[13px] text-slate-400 text-center leading-relaxed mb-6">
+        Select two politicians to compare their records, laws, attendance, and
+        accountability side by side.
+      </Text>
+      <View className="flex-row gap-3 w-full">
+        <Pressable
+          onPress={onSelectA}
+          className="flex-1 py-3 rounded-2xl border-2 border-dashed border-amber-300 items-center"
+          style={{backgroundColor: '#fffbeb'}}
+        >
+          <Text className="text-amber-600 font-bold text-[13px]">
+            + Candidate A
+          </Text>
+        </Pressable>
+        <Pressable
+          onPress={onSelectB}
+          className="flex-1 py-3 rounded-2xl border-2 border-dashed border-indigo-300 items-center"
+          style={{backgroundColor: '#eef2ff'}}
+        >
+          <Text className="text-indigo-600 font-bold text-[13px]">
+            + Candidate B
+          </Text>
+        </Pressable>
+      </View>
+    </View>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// MAIN SCREEN
+// ─────────────────────────────────────────────────────────────────────────────
 export default function CompareScreen() {
+  const [candidateA, setCandidateA] = useState<Politician | null>(null);
+  const [candidateB, setCandidateB] = useState<Politician | null>(null);
+  const [showPickerA, setShowPickerA] = useState(false);
+  const [showPickerB, setShowPickerB] = useState(false);
+
+  const bothSelected = candidateA && candidateB;
+
   return (
     <SafeAreaView className="flex-1" style={{backgroundColor: '#F3F4F8'}}>
+      {/* ── Top header ── */}
+      <View className="bg-white px-5 py-4 border-b border-slate-100">
+        <Text className="text-[18px] font-bold text-slate-800">Compare</Text>
+        <Text className="text-[12px] text-slate-400 mt-0.5">
+          Select two politicians to compare side by side
+        </Text>
+      </View>
+
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{paddingBottom: 75}}
+        contentContainerStyle={{paddingBottom: 100}}
       >
-        <CandidateHeader a={CANDIDATE_A} b={CANDIDATE_B} />
+        {/* ── Candidate header ── */}
+        <View
+          className="mx-4 mt-4 rounded-3xl overflow-hidden"
+          style={{backgroundColor: '#1A1F36'}}
+        >
+          <View className="px-6 pt-6 pb-8">
+            <View className="flex-row items-center justify-between">
+              <CandidateSlot
+                politician={candidateA}
+                badge="A"
+                badgeColor="#F59E0B"
+                onPress={() => setShowPickerA(true)}
+              />
+              {/* VS badge */}
+              <View
+                className="rounded-full items-center justify-center mx-3"
+                style={{backgroundColor: '#F59E0B', width: 36, height: 36}}
+              >
+                <Text
+                  style={{color: '#1A1F36', fontSize: 11, fontWeight: '800'}}
+                >
+                  VS
+                </Text>
+              </View>
+              <CandidateSlot
+                politician={candidateB}
+                badge="B"
+                badgeColor="#6366F1"
+                onPress={() => setShowPickerB(true)}
+              />
+            </View>
+          </View>
+        </View>
 
-        {/* Gap */}
-        <View className="h-4" />
+        {!bothSelected ? (
+          <EmptyCompare
+            onSelectA={() => setShowPickerA(true)}
+            onSelectB={() => setShowPickerB(true)}
+          />
+        ) : (
+          <>
+            <View className="h-4" />
 
-        <StatRow
-          label="Term in Office"
-          left={`${CANDIDATE_A.termYears} Years`}
-          right={`${CANDIDATE_B.termYears} Years`}
-        />
+            <StatRow
+              label="Term Experience"
+              left={`${candidateA.termExperienceYears} yrs`}
+              right={`${candidateB.termExperienceYears} yrs`}
+              leftWins={
+                candidateA.termExperienceYears > candidateB.termExperienceYears
+              }
+              rightWins={
+                candidateB.termExperienceYears > candidateA.termExperienceYears
+              }
+            />
 
-        <StatRow
-          label="Bills Authored"
-          left={`${CANDIDATE_A.billsAuthored}`}
-          right={`${CANDIDATE_B.billsAuthored}`}
-        />
+            <StatRow
+              label="Bills Authored"
+              left={`${candidateA.billsAuthored}`}
+              right={`${candidateB.billsAuthored}`}
+              leftWins={candidateA.billsAuthored > candidateB.billsAuthored}
+              rightWins={candidateB.billsAuthored > candidateA.billsAuthored}
+            />
 
-        <AttendanceRow a={CANDIDATE_A} b={CANDIDATE_B} />
+            <StatRow
+              label="Laws Passed"
+              left={`${candidateA.lawsPassed}`}
+              right={`${candidateB.lawsPassed}`}
+              leftWins={candidateA.lawsPassed > candidateB.lawsPassed}
+              rightWins={candidateB.lawsPassed > candidateA.lawsPassed}
+            />
 
-        <StatRow
-          label="Declared Assets (SALN)"
-          left={CANDIDATE_A.declaredAssets}
-          right={CANDIDATE_B.declaredAssets}
-          leftSub={CANDIDATE_A.assetYear}
-          rightSub={CANDIDATE_B.assetYear}
-        />
+            <AttendanceRow a={candidateA} b={candidateB} />
 
-        <AccountabilityRow a={CANDIDATE_A} b={CANDIDATE_B} />
+            <StatRow
+              label="Declared Assets (SALN)"
+              left={candidateA.netWorthLabel}
+              right={candidateB.netWorthLabel}
+              leftSub={candidateA.salnYear}
+              rightSub={candidateB.salnYear}
+            />
 
-        <QuickInsight a={CANDIDATE_A} b={CANDIDATE_B} />
+            <AccountabilityRow a={candidateA} b={candidateB} />
+
+            <PlatformRow a={candidateA} b={candidateB} />
+
+            <QuickInsight a={candidateA} b={candidateB} />
+          </>
+        )}
       </ScrollView>
+
+      {/* ── Pickers ── */}
+      <PickerModal
+        visible={showPickerA}
+        onClose={() => setShowPickerA(false)}
+        onSelect={setCandidateA}
+        exclude={candidateB?.id}
+      />
+      <PickerModal
+        visible={showPickerB}
+        onClose={() => setShowPickerB(false)}
+        onSelect={setCandidateB}
+        exclude={candidateA?.id}
+      />
     </SafeAreaView>
   );
 }

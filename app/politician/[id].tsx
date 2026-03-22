@@ -629,13 +629,18 @@ export default function PoliticianProfile() {
         <View className="items-center px-5 pb-5">
           {/* Avatar */}
           <View
-            className="w-24 h-24 rounded-full items-center justify-center mb-3 border-4 border-white/20"
+            className="w-24 h-24 rounded-full overflow-hidden border-2 border-white/20"
             style={{backgroundColor: accent + '40'}}
           >
             {politician.profileSrc ? (
               <Image
                 source={politician.profileSrc}
-                className="w-24 h-24 rounded-full"
+                style={{
+                  width: 88,
+                  height: 120,
+                  resizeMode: 'cover',
+                  marginBottom: 20 // adjust this value until face is centered
+                }}
               />
             ) : (
               <Text className="text-white font-bold text-3xl">{initials}</Text>

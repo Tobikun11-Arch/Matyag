@@ -124,7 +124,7 @@ export const presidents: Politician[] = [
       {bill: 'Anti-Dynasty Bill', vote: 'YES'},
     ],
     bio: 'Former Congresswoman and DILG Undersecretary from Cebu. Champion of healthcare reform and gender equality legislation. Clean accountability record with one of the highest attendance rates among presidential candidates.',
-    profileSrc: null,
+    profileSrc: require('../assets/images/president/Esperanza.png'),
   },
   {
     id: 'p-003',
@@ -159,7 +159,7 @@ export const presidents: Politician[] = [
       {bill: 'SOGIE Equality Bill', vote: 'NO'},
     ],
     bio: 'Three-term former Mayor and Senate President from Davao del Sur. The most experienced candidate by years in office. Commands strong regional support but carries unresolved accountability questions.',
-    profileSrc: null,
+    profileSrc: require('../assets/images/president/Aurelio.png'),
   },
   {
     id: 'p-004',
@@ -191,7 +191,7 @@ export const presidents: Politician[] = [
       {bill: 'Freedom of Information Bill', vote: 'YES'},
     ],
     bio: 'Former tech entrepreneur turned first-time Senator from Makati. Youngest presidential candidate with the highest net worth. Limited legislative track record but a strong transparency and digital reform agenda.',
-    profileSrc: null,
+    profileSrc: require('../assets/images/president/Lorenzo.png'),
   },
 ];
 

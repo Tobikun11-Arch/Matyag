@@ -84,7 +84,15 @@ function PoliticianCard({
       <View className="relative mr-4">
         <View className="w-14 h-14 rounded-full bg-slate-200 items-center justify-center overflow-hidden">
           {item.profileSrc ? (
-            <Image source={item.profileSrc} className="w-14 h-14" />
+            <Image
+              source={item.profileSrc}
+              style={{
+                width: 56,
+                height: 80,
+                resizeMode: 'cover',
+                marginBottom: -25 
+              }}
+            />
           ) : (
             <Text className="text-slate-500 font-bold text-lg">{initials}</Text>
           )}
