@@ -1,50 +1,124 @@
-# Welcome to your Expo app 👋
+# MATYAG 🇵🇭
+### Manood. Suriin. Bumoto nang may kaalaman.
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+**Hackathon Entry — Challenge #3: Transparency, Accountability, and Good Governance**
+Aligned with **UN SDG 16 — Peace, Justice and Strong Institutions**
 
-## Get started
 
-1. Install dependencies
+MATYAG is a civic transparency platform that gives every Filipino citizen clear, verified, and up-to-date information about candidates and officials running for or holding national-level positions in the Philippines. The name comes from the Filipino word meaning *"to watch with vigilance"* — exactly what the app empowers citizens to do.
 
-   ```bash
-   npm install
-   ```
+---
 
-2. Start the app
+## The Problem
 
-   ```bash
-   npx expo start
-   ```
+The Philippines has a culture of political dynasties, personality-based voting, and a deeply local governance structure. Most voters have *no accessible, unified, and centralized source* to check a political figure's record — let alone compare candidates on actual policy substance.
 
-In the output, you'll find options to open the app in a
+MATYAG solves this.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+---
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## Key Features
 
-## Get a fresh project
+### 👤 Candidate Profiles
+Complete public records for each candidate or official — experience, legislative history, laws authored, filed legal cases, and known political family connections. Every entry is source-linked to official documents.
 
-When you're ready, run:
+### 🔍 Search & Discovery
+Search by name, position, or political party. Browse full candidate and official lists with fast filters optimized for election season browsing.
 
-```bash
-npm run reset-project
-```
+### ⚖️ Side-by-Side Comparison
+Compare two or more candidates across the same metrics — experience, records, laws, and cases — without switching between profiles.
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+### 🗳️ Personal Ballot Builder
+Select candidates for each national position, generate a personal sample ballot, and share it on social media. Turns private research into a public civic statement.
 
-## Learn more
+---
 
-To learn more about developing your project with Expo, look at the following resources:
+## Covered Positions
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+| Position | Details |
+|---|---|
+| 🏛️ President | Head of state — orders, proclamations, governance record |
+| 🏛️ Vice President | Elected separately — background, portfolio, public record |
+| 🏛️ Senators | 12 elected every 3 years — bills, laws, attendance, voting history |
+| 🏛️ Party-list Representatives | Sector representation, org background, legislative contributions |
 
-## Join the community
+⚠️ **Scope note:** MATYAG covers **national elected positions only**. Local government, judicial, and appointed cabinet positions are outside the current scope due to inconsistent or non-digital records.
 
-Join our community of developers creating universal apps.
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Framework | [React Native](https://reactnative.dev/) via [Expo](https://expo.dev/) |
+| Language | TypeScript |
+| Styling | [NativeWind](https://www.nativewind.dev/) (Tailwind CSS for React Native) |
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js >= 18
+- npm or yarn
+- Expo CLI (npm install -g expo-cli)
+- Expo Go app on your mobile device, or an iOS/Android simulator
+
+### Installation
+
+# 1. Clone the repository
+git clone https://github.com/your-username/matyag.git
+cd matyag
+
+# 2. Install dependencies
+npm install
+
+# 3. Start the development server
+npx expo start
+
+### Running the App
+
+| Command | Platform |
+|---|---|
+| npx expo start | Opens Expo Dev Tools (scan QR with Expo Go) |
+| npx expo start --android | Opens in Android emulator |
+| npx expo start --ios | Opens in iOS simulator (macOS only) |
+
+
+## Project Structure
+
+matyag/
+├── app/                  # Expo Router screens
+├── components/           # Reusable UI components
+├── constants/            # Colors, fonts, config
+├── hooks/                # Custom React hooks
+├── types/                # TypeScript interfaces & types
+├── utils/                # Helper functions
+├── assets/               # Images, icons, fonts
+└── tailwind.config.js    # NativeWind / Tailwind config
+
+---
+
+## Hackathon Context
+
+This project was built for *Challenge #3 — Transparency, Accountability, and Good Governance*, addressing the lack of centralized, verifiable civic information in the Philippine electoral landscape.
+
+*Delimitations (by design):*
+- ❌ No local government positions (data inconsistency)
+- ❌ No judicial branch (appointed, not elected)
+- ❌ No cabinet secretaries (appointed, not elected)
+- ❌ No unverified or unofficial claims
+
+---
+
+## License
+
+This project is open source and available under the [MIT License](LICENSE).
+
+---
+
+<p align="center">
+  Built with 🤍 for every Filipino voter.
+</p>

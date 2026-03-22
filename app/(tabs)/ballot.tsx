@@ -624,7 +624,8 @@ function SlideAllBallot({
                         fontSize: 14,
                         fontWeight: '900',
                         color: C.blue,
-                        width: 16
+                        width: 24,
+                        textAlign: 'center' 
                       }}
                     >
                       {i + 1}
@@ -654,7 +655,7 @@ function SlideAllBallot({
                           fontSize: 14,
                           fontWeight: '900',
                           color: C.blue,
-                          width: 16
+                          width: 24
                         }}
                       >
                         {i + 7}

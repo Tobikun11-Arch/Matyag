@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "Matyag",
+    "name": "",
     "slug": "Matyag",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/images/Matyag-no-bg-no-text.png",
+    "icon": "./assets/images/Matyag-overlay-1.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
