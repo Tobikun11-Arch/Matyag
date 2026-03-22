@@ -1,4 +1,4 @@
-# MATYAG 🇵🇭
+# MATYAG
 ### Manood. Suriin. Bumoto nang may kaalaman.
 
 **Hackathon Entry — Challenge #3: Transparency, Accountability, and Good Governance**
